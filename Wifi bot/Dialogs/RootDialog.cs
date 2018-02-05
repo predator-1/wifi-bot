@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using Wifi_bot.Models;
+using Wifi_Bot.Services;
 
 namespace Wifi_bot.Dialogs
 {
@@ -18,12 +22,50 @@ namespace Wifi_bot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<object> result)
         {
             var activity = await result as Activity;
+            if (activity?.ChannelId == "telegram")
+            {
+                var userLocation = activity.Entities?.Select(t => t.GetAs<TelegramGeoModel>())
+                    .FirstOrDefault(r => r?.Geo?.Type == "GeoCoordinates");
+                if (userLocation != null)
+                {
+                    var reply = context.MakeMessage();
 
-            // calculate something for us to return
-            int length = (activity.Text ?? string.Empty).Length;
+                    WifiService wifiService = new WifiService();
+                    var cards = new List<CardAction>();
+                    foreach (var place in await wifiService.GetGoogleMaps(userLocation.Geo.Latitude, userLocation.Geo.Longitude))
+                    {
+                        cards.Add(new CardAction
+                        {
+                            Title = place.Title,
+                            Type = ActionTypes.OpenUrl,
+                            Value = place.Url
+                        });
+                    }
 
-            // return our reply to the user
-            await context.PostAsync($"You sent {activity.Text} which was {length} characters");
+                    if (cards.Any())
+                    {
+                        reply.Attachments.Add(new HeroCard
+                        {
+                            Title = "Open your wifi places in 200 meters!",
+                            Buttons = cards
+
+                        }.ToAttachment());
+                    }
+                    else
+                    {
+                        reply.Text = "We can't find wifi places near you.";
+                    }
+
+                    await context.PostAsync(reply);
+
+                    context.Wait(MessageReceivedAsync);
+
+                    return;
+                }
+               
+            }
+
+            await context.PostAsync("Send me your location please.");
 
             context.Wait(MessageReceivedAsync);
         }

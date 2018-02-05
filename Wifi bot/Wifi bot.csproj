@@ -126,8 +126,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Content\Models\WifiModel.cs" />
-    <Compile Include="Content\Services\WifiService.cs" />
+    <Compile Include="Models\GoogleMapsModel.cs" />
+    <Compile Include="Models\TelegramGeoModel.cs" />
+    <Compile Include="Models\WifiModel.cs" />
+    <Compile Include="Services\WifiService.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Global.asax.cs">
@@ -146,6 +148,9 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
 
-namespace Wifi_Bot.Content.Models
+namespace Wifi_bot.Models
 {
     public class WifiModel
     {
